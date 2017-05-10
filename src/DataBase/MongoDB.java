@@ -1,7 +1,12 @@
 package DataBase;
 
 import Log.Logs;
+import com.mongodb.MongoClientURI;
 import com.mongodb.MongoClient;
+//import com.mongodb.DBCursor;
+//import com.mongodb.client.MongoCollection;
+//import com.mongodb.client.MongoCursor;
+//import com.mongodb.client.MongoDatabase;
 
 /**
  * Created by yiqibai on 12/27/15.
@@ -10,6 +15,7 @@ public abstract class MongoDB implements DataBase {
     private String ip;
     private int port;
     private String db;
+    private String url;
     MongoClient mongo;
     Logs loger;
 
@@ -19,6 +25,8 @@ public abstract class MongoDB implements DataBase {
         this.loger = loger;
         this.ip = ip;
         this.port = port;
+        this.url = String.format("mongodb://%s:%s@%s:27017/?authSource=admin&authMechanism=SCRAM-SHA-1",
+                "root", "wtroot", this.ip);
         Connect();
     }
 
@@ -27,7 +35,8 @@ public abstract class MongoDB implements DataBase {
     @Override
     public void Connect() {
         try {
-            mongo = new MongoClient(ip, port);
+            MongoClientURI murl = new MongoClientURI(url);
+            mongo = new MongoClient(murl);
         } catch (Exception e) {
             loger.server("MongoException [" + e.getMessage() + "]");
         }
@@ -38,7 +47,9 @@ public abstract class MongoDB implements DataBase {
     @Override
     public void Close() {
         mongo.close();
+
     }
+
 
 
     public void setIp(String ip) {
@@ -69,7 +80,5 @@ public abstract class MongoDB implements DataBase {
     public String getDb() {
         return db;
     }
-
-
 
 }
